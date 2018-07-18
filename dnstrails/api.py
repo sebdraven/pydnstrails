@@ -1,3 +1,5 @@
+import warnings
+
 import requests
 
 from dnstrails.exception import APIError
@@ -10,6 +12,22 @@ This module implements the DNSTrail API.
 
 :copyright: (c) 2018 - by Sebastien Larinier
 """
+
+
+def deprecated(message):
+    def deprecated_decorator(func):
+        def deprecated_func(*args, **kwargs):
+            warnings.warn(
+                "{} is a deprecated function. {}".format(func.__name__,
+                                                         message),
+                category=DeprecationWarning,
+                stacklevel=2)
+            warnings.simplefilter('default', DeprecationWarning)
+            return func(*args, **kwargs)
+
+        return deprecated_func
+
+    return deprecated_decorator
 
 
 class DnsTrails:
@@ -339,6 +357,7 @@ class DnsTrails:
 
         return self._query(query, method='post', **kwargs)
 
+    @deprecated('a new implementation of stat will be developped')
     def search_stats(self, **kwargs):
         """Call API stats
         POST https://api.securitytrails.com/v1/search/list/stats
